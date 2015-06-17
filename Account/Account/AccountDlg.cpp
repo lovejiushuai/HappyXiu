@@ -71,6 +71,7 @@ BEGIN_MESSAGE_MAP(CAccountDlg, CDialogEx)
 	ON_BN_CLICKED( IDC_BUTTON_MIN, OnButtonClickedM)
 	ON_BN_CLICKED( IDC_BUTTON_MAIN1, OnButtonClickedMain)
 	ON_BN_CLICKED( IDC_BUTTON_MAIN2, OnButtonClickedMain)
+	ON_MESSAGE(WM_START_DLL, LaunchDll)
 
 END_MESSAGE_MAP()
 
@@ -297,21 +298,67 @@ HCURSOR CAccountDlg::OnQueryDragIcon()
 void CAccountDlg::OnButtonClickedMain()
 {
 	/*AfxMessageBox(_T("Main"));*/
+	PostMessage(WM_START_DLL, 0, 0);
 }
 
 void CAccountDlg::OnButtonClickedLZX()
 {
 	/*AfxMessageBox(_T("LanZhouXi"));*/
+	PostMessage(WM_START_DLL, 0, 0);
 }
 void CAccountDlg::OnButtonClickedLXD()
 {
 	/*AfxMessageBox(_T("LanXiDong"));*/
+	PostMessage(WM_START_DLL, 0, 0);
 }
 void CAccountDlg::OnButtonClickedC()
 {
 	/*AfxMessageBox(_T("Chen"));*/
+	PostMessage(WM_START_DLL, 0, 0);
 }
 void CAccountDlg::OnButtonClickedM()
 {
 	/*AfxMessageBox(_T("Min"));*/
+	PostMessage(WM_START_DLL, 0, 0);
+}
+
+LRESULT  CAccountDlg::LaunchDll(WPARAM wParam, LPARAM lParam)
+{
+	CAccountApp* pApp = (CAccountApp*)AfxGetApp();
+	HINSTANCE  hDllLibrary = NULL;
+	CString dllStr = _T("Detail.dll");
+
+
+	pApp->m_hApptDllInstance = LoadLibrary(dllStr); 
+	hDllLibrary = pApp->m_hApptDllInstance;
+	if(!hDllLibrary)
+	{
+		TRACE(_T("LoadLibrary Failed, Error=%d: %s"), GetLastError(), dllStr);
+		return 0;
+	}
+	LaunchDllFunc = (LaunchDllFuncAPI)GetProcAddress(hDllLibrary, "StartDll");
+	ASSERT(LaunchDllFunc);
+	if(!LaunchDllFunc)
+		return 0;
+	ShowWindow(SW_HIDE);
+	// m_hInstPhoneLib is HINSTANCE of AnwMobile
+	LaunchDllFunc(GetSafeHwnd(),
+		pApp->m_hApptDllInstance,
+		&pDllEntryWinApp);
+	ExitDLLMessage(0,0);
+	return 1L;
+}
+
+LRESULT CAccountDlg::ExitDLLMessage(WPARAM wParam,LPARAM lParam)
+{
+	ShowWindow(SW_SHOW);
+
+	// #endif
+	//	CCAMagicMobileApp* pApp = (CCAMagicMobileApp*)AfxGetApp();
+	if(theApp.m_hApptDllInstance)
+	{
+		FreeLibrary(theApp.m_hApptDllInstance);
+		theApp.m_hApptDllInstance = NULL;
+	}
+	return 1L;
 }

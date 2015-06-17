@@ -5,6 +5,11 @@
 #pragma once
 
 
+// DLL CONTRUCT
+//typedef int (WINAPI* LaunchDllEntryFuncAPI)(HWND,HINSTANCE &,CWinApp** ,CString);
+// Don't pass CString, It's ok for CString &
+typedef int (WINAPI* LaunchDllFuncAPI)(HWND,HINSTANCE &,CWinApp**);
+
 // CAccountDlg dialog
 class CAccountDlg : public CDialogEx
 {
@@ -44,11 +49,17 @@ protected:
 	int widthRect,heightRectL,heightRectS,topRect;
 	int lineY_1,lineY_2;
 
+	LaunchDllFuncAPI LaunchDllFunc;
+	LRESULT ExitDLLMessage(WPARAM wParam,LPARAM lParam);
+
+
 public:
 	afx_msg void OnButtonClickedLZX();
 	afx_msg void OnButtonClickedLXD();
 	afx_msg void OnButtonClickedC();
 	afx_msg void OnButtonClickedM();
 	afx_msg void OnButtonClickedMain();
+	afx_msg LRESULT  LaunchDll(WPARAM wParam, LPARAM lParam);
+	CWinApp  *pDllEntryWinApp;
 
 };

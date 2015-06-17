@@ -11,6 +11,8 @@
 #include "resource.h"		// main symbols
 
 
+#define WM_START_DLL		WM_USER+100
+
 // CAccountApp:
 // See Account.cpp for the implementation of this class
 //
@@ -23,7 +25,7 @@ public:
 	TCHAR m_strCurDir[MAX_PATH];
 	TCHAR m_exeFullPath[MAX_PATH]; 
 
-
+	HINSTANCE m_hApptDllInstance;
 
 // Overrides
 public:
